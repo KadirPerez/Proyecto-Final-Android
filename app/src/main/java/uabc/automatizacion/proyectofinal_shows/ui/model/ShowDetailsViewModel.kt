@@ -18,7 +18,7 @@ class ShowDetailViewModel(
     safeStateHandle: SavedStateHandle,
 ): ViewModel() {
     val showId: Int = safeStateHandle.toRoute<ShowDetails>().showId
-    val : Boolean = safeStateHandle.toRoute<ShowDetails>().isFavourite
+    val isFavourite: Boolean = safeStateHandle.toRoute<ShowDetails>().isFavourite
 
     private val _homeUIState = MutableStateFlow<ShowDetailsUiState>(ShowDetailsUiState.Loading)
     val showDetailUIState: StateFlow<ShowDetailsUiState> get() = _homeUIState
