@@ -6,7 +6,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import uabc.automatizacion.proyectofinal_shows.data.model.SearchResponse
 import uabc.automatizacion.proyectofinal_shows.data.model.Show
 
 private const val BASE_URL = "https://api.tvmaze.com"
@@ -25,7 +27,10 @@ interface ShowApiService {
     suspend fun getShows(): Response<List<Show>>
 
     @GET("search/shows")
-    suspend fun getShowsPerName(@Query("q") query: String): Response<List<Show>>
+    suspend fun getShowsPerName(@Query("q") query: String): Response<List<SearchResponse>>
+
+    @GET("shows/{id}")
+    suspend fun getShowById(@Path("id") id: Int): Response<Show>
 }
 
 object TVMazeApi {

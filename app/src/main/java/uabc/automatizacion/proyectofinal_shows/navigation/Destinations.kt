@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 object ShowsList
 
 @Serializable
-data class ShowDetails(val showId: Int)
+data class ShowDetails(val showId: Int, val isFavourite: Boolean)
+
+@Serializable
+object Favourites

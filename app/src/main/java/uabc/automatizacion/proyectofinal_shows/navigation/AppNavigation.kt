@@ -1,47 +1,76 @@
 package uabc.automatizacion.proyectofinal_shows.navigation
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import uabc.automatizacion.proyectofinal_shows.ui.views.ShowDetailsScreen
-import uabc.automatizacion.proyectofinal_shows.ui.model.ShowDetailModel
+import uabc.automatizacion.proyectofinal_shows.data.database.ShowDatabase
+import uabc.automatizacion.proyectofinal_shows.ui.model.ShowDetailViewModel
 import uabc.automatizacion.proyectofinal_shows.ui.model.ShowsListViewModel
-import uabc.automatizacion.proyectofinal_shows.ui.model.TopBarViewModel
+import uabc.automatizacion.proyectofinal_shows.ui.views.ShowDetailsScreen
 import uabc.automatizacion.proyectofinal_shows.ui.views.ShowsListScreen
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    topBarModel: TopBarViewModel
+    showListViewModel: ShowsListViewModel
 ){
     NavHost(
         modifier = modifier,
         navController = navHostController,
-        startDestination = ShowsList
+        startDestination = ShowsList,
     ){
 
         composable<ShowsList> {
-            val vm : ShowsListViewModel = viewModel()
-
-            topBarModel.canBack.value = false
-            topBarModel.title.value = "Flick"
-            topBarModel.isSearching.value = true
-
-            vm.fetchShows()
-
-            ShowsListScreen(vm)
+            BackHandler {}
+            ShowsListScreen(
+                viewModel = showListViewModel,
+                onShowClick = { show, isFavourite ->
+                    navHostController.navigate(ShowDetails(show.id?: 0, isFavourite))
+                    showListViewModel.onShowDetails()
+                },
+                justFavourites = false,
+                onFavouriteClick = { show , favouritesShows ->
+                    showListViewModel.updateDatabase(show, favouritesShows)
+                }
+            )
         }
 
-        composable<ShowDetails> {
-            val vm : ShowDetailModel = viewModel()
+        composable<Favourites> {
+            BackHandler {}
+            ShowsListScreen(
+                viewModel = showListViewModel,
+                onShowClick = { show, isFavourite ->
+                    navHostController.navigate(ShowDetails(show.id?: 0, isFavourite))
+                    showListViewModel.onShowDetails()
+                },
+                justFavourites = true,
+                onFavouriteClick = { show , favouritesShows ->
+                    showListViewModel.updateDatabase(show, favouritesShows)
+                }
+            )
+        }
 
-            topBarModel.canBack.value = true
-            topBarModel.title.value = "Flick"
-            topBarModel.isSearching.value = false
-
+        composable<ShowDetails>(
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            }
+        ) {
+            BackHandler {}
             ShowDetailsScreen()
         }
     }
